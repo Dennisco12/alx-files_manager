@@ -7,47 +7,67 @@ const url = `mongodb://${HOST}:${PORT}`;
 
 class DBClient {
   constructor() {
+    const url = `mongodb://${HOST}:${PORT}/${dbName}`;
     this.client = new MongoClient(url, {
       useUnifiedTopology: true,
       useNewUrlParser: true
     });
-    this.client.connect().then(() => {
+    /*this.client.connect().then(() => {
       this.db = this.client.db(`${dbName}`);
     }).catch((err) => {
       console.log(err.message);
-    });
-    /*MongoClient.connect(`mongodb://${HOST}:${PORT}`, {
-      useUnifiedTopology: true,
-      useNewUrlParser: true,
-    }, (err, client) => {
-      if (!err) {
-        console.log('Mongo succesfully connected');
-        this.db = client.db(dbName);
-        this.allUsers = this.db.collection('users');
-        this.allFiles = this.db.collection('files');
-      } else {
-        console.log('Mongo client not connected:', err.message);
-        this.db = false;
-      }
     });*/
   }
 
-  isAlive() {
-    return Boolean(this.db);
+  async isAlive() {
+    try {
+      await this.client.connect();
+      return true;
+    } catch (err) {
+      console.log(err.message);
+      return false;
+    } finally {
+      await this.client.close();
+    }
+    //return Boolean(this.db);
   }
 
   async nbUsers() {
-    return this.allUsers.countDocuments();
+    try {
+      await this.client.connect();
+      const users = this.client.db().collection("users");
+      const count = await users.countDocuments();
+      return count;
+    } catch (error) {
+      return -1;
+    } finally {
+      await this.client.close();
+    }
+    //return this.allUsers.countDocuments();
     /*const doc = 'users';
     const allUsers = doc.find({}).toArray();
     return allUsers.length;*/
   }
 
   async nbFiles() {
-    return this.allFiles.countDocuments();
+    try {
+      await this.client.connect();
+      const files = this.client.db().collection("files");
+      const count = await files.countDocuments();
+      return count;
+    } catch (error) {
+      return -1;
+    } finally {
+      await this.client.close();
+    }
+    //return this.allFiles.countDocuments();
     /*const doc = 'files';
     const allFiles = doc.find({}).toArray();
     return allFiles.length;*/
+  }
+
+  async usersCollection() {
+    return this.client.db().collection("users");
   }
 }
 
