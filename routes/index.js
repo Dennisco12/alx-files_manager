@@ -1,4 +1,5 @@
 import AppController from '../controllers/AppController';
+import FilesController from '../controllers/FilesController';
 import AuthController from '../controllers/AuthController';
 import UsersController from '../constrollers/UsersController';
 import { Router } from 'express';
@@ -29,6 +30,30 @@ function controller(app) {
 
   router.get('/users/me', (req, res) => {
     UsersController.getMe(req, res);
+  })
+
+  router.post('/files', (req, res) => {
+    FilesController.postUpload(req, res);
+  })
+
+  router.get('/files/:id', (req, res) => {
+    FilesController.getShow(req, res);
+  })
+
+  router.get('/files', (req, res) => {
+    FilesController.getShow(req, res);
+  })
+
+  router.put('/files/:id/publish', (req, res) => {
+    FilesController.putPublish(req, res);
+  })
+
+  router.put('/files/:id/publish', (req, res) => {
+    FilesController.putUnpublish(req, res);
+  })
+
+  router.get('/files/:id/data', (req, res) => {
+    FilesController.getFile(req, res);	  
   })
 }
 
